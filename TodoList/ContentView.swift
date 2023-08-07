@@ -36,6 +36,10 @@ struct ContentView: View {
                     ForEach($notesViewModel.notes, id: \.id)
                     { $note in
                         HStack{
+                            if note.isFavorited {
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.yellow)
+                            }
                             Text(note.description)
                         }
                         .swipeActions(edge: .trailing){
@@ -53,7 +57,6 @@ struct ContentView: View {
                             Button{
                                 notesViewModel
                                     .removeNote(withId: note.id)
-
                                     
                             }label: {
                                 Label("Borrar", systemImage: "trash.fill" )
