@@ -8,14 +8,69 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var description: String = ""
+    @ObservedObject var notesViewModel = NoteViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationView{
+            VStack{
+                Text("Añade una tarea")
+                    .underline()
+                    .foregroundColor(.gray)
+                    .padding(.horizontal,16)
+                TextEditor(text: $description)
+                .foregroundColor(.gray)
+                .frame(height: 100)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8).stroke(.green,lineWidth: 2)
+                }
+                Button("Crear"){
+                    notesViewModel.saveNote(description: description)
+                    description = ""
+                    
+                }
+                .buttonStyle(.bordered)
+                .tint(.green)
+                Spacer()
+                List {
+                    ForEach($notesViewModel.notes, id: \.id)
+                    { $note in
+                        HStack{
+                            Text(note.description)
+                        }
+                        .swipeActions(edge: .trailing){
+                            Button{
+                                notesViewModel
+                                    .updateFavoriteNote(
+                                    notes: $note
+                                    )
+                            }label: {
+                                Label("Favorito", systemImage: "star.fill" )
+                            }.tint(.yellow)
+                            
+                        }
+                        .swipeActions(edge: .leading){
+                            Button{
+                                notesViewModel
+                                    .removeNote(withId: note.id)
+
+                                    
+                            }label: {
+                                Label("Borrar", systemImage: "trash.fill" )
+                            }.tint(.red)
+                            
+                        }
+                    }
+                }
+                
+            }.padding()
+                .navigationTitle("To Do")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar{
+                    Text(notesViewModel.getNumberOfNotes())
+                }
+            
         }
-        .padding()
     }
 }
 
